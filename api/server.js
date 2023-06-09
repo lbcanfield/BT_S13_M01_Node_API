@@ -2,6 +2,7 @@ const express = require('express');
 const USERS = require('./users/model')
 
 const server = express();
+server.use(express.json());
 
 const apiURL = '/api/users/'
 
@@ -38,6 +39,27 @@ server.get(`${apiURL}:id`, async (request, response) => {
      }
 })
 
+// [POST] - Creates a new user
+server.post(`${apiURL}`, async (request, response) => {
+     try {
+          const data = request.body;
+          if (!data.name || !data.bio) {
+               response.status(400).json({
+                    message: "Please provide name and bio for the user"
+               })
+          }
+          else {
+               // throw new Error('oops');
+               const newUser = await USERS.insert(data);
+               response.status(201).json(newUser)
+          }
+     }
+     catch (error) {
+          response.status(500).json({
+               message: "There was an error while saving the user to the database"
+          })
+     }
+})
 
 // Catch all when nothing specific is specified
 server.use('*', (request, response) => {
