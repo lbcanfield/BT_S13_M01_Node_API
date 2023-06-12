@@ -61,6 +61,26 @@ server.post(`${apiURL}`, async (request, response) => {
      }
 })
 
+// [DELETE] - Deletes a specific user based on id
+server.delete(`${apiURL}:id`, async (request, response) => {
+     try {
+          const selectedUser = await USERS.findById(request.params.id)
+          if (!selectedUser) {
+               response.status(404).json({
+                    message: "The user with the specified ID does not exist"
+               })
+          }
+          else {
+               const deletedUser = await USERS.remove(selectedUser.id)
+               response.status(200).json(deletedUser)
+          }
+
+     }
+     catch {
+
+     }
+})
+
 // Catch all when nothing specific is specified
 server.use('*', (request, response) => {
      response.status(404).json({
