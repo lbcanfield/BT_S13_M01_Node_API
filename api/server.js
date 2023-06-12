@@ -61,6 +61,36 @@ server.post(`${apiURL}`, async (request, response) => {
      }
 })
 
+// [PUT] - updates a specific user
+server.put(`${apiURL}:id`, async (request, response) => {
+     const { id } = request.params;
+     const { name, bio } = request.body;
+     try {
+          const fetchUser = await USERS.findById(id)
+          if (!fetchUser) {
+               response.status(404).json({
+                    message: "The user with the specified ID does not exist"
+               })
+          }
+          else {
+               if (!name || !bio) {
+                    response.status(400).json({
+                         message: "Please provide name and bio for the user"
+                    })
+               }
+               else {
+                    const updatedUser = await USERS.update(id, { name, bio })
+                    response.status(200).json(updatedUser);
+               }
+          }
+     }
+     catch (error) {
+          response.status(500).json({
+               message: "There was an error while saving the user to the database"
+          })
+     }
+})
+
 // [DELETE] - Deletes a specific user based on id
 server.delete(`${apiURL}:id`, async (request, response) => {
      try {
@@ -76,10 +106,14 @@ server.delete(`${apiURL}:id`, async (request, response) => {
           }
 
      }
-     catch {
-
+     catch (error) {
+          response.status(500).json({
+               message: "There was an error while saving the user to the database"
+          })
      }
 })
+
+
 
 // Catch all when nothing specific is specified
 server.use('*', (request, response) => {
